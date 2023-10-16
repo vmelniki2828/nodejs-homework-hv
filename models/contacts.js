@@ -1,57 +1,51 @@
-const fs = require('fs/promises');
-const path = require('path');
+const { Schema, model } = require("mongoose");
+const err = require("../consts/err");
+const reg = require("../consts/reg");
+const saveError = require("../helpers/saveErr");
 
-const contactsPath = path.join(__dirname, '/contacts.json');
+const contactSchemaMongoose = new Schema(
+    {
+        name: {
+            type: String,
+            minlength: [3, err.errMsgMin],
+            maxlength: [50, err.errMsgMax],
+            required: [true, err.errMsgNameRequired],
+        },
+        email: {
+            type: String,
+            unique: true,
+            validate: {
+                validator: function (v) {
+                    return reg.emailRegexp.test(v);
+                },
+                message: (props) =>
+                    `${props.value} ${err.errMsgEmailRegexp}`,
+            },
+            required: [true, err.errMsgEmailRequired],
+        },
+        phone: {
+            type: String,
+            unique: true,
+            validate: {
+                validator: function (v) {
+                    return reg.phoneRegexp.test(v);
+                },
+                message: (props) =>
+                    `${props.value} ${err.errMsgPhoneRegexp}`,
+            },
+            required: [true, err.errMsgPhoneRequired],
+        },
+        favorite: { type: Boolean, default: false },
+    },
+    { versionKey: false, timestamps: true }
+);
 
-const listContacts = async () => {
-  const data = await fs.readFile(contactsPath);
-  const contacts = JSON.parse(data);
-  return contacts;
-};
+// for error add (post)
+contactSchemaMongoose.post("save", saveError);
 
-const getContactById = async contactId => {
-  const data = await listContacts();
-  const contact = data.find(el => el.id === contactId);
-  if (!contact) {
-    return null;
-  }
-  return contact;
-};
+// for error update (put)
+contactSchemaMongoose.post("findOneAndUpdate", saveError);
 
-const removeContact = async contactId => {
-  const data = await listContacts();
-  const index = data.findIndex(el => el.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  const result = data.splice(index, 1);
-  fs.writeFile(contactsPath, JSON.stringify(data));
-  return result;
-};
+const Contact = model("contact", contactSchemaMongoose);
 
-const addContact = async body => {
-  const data = await listContacts();
-  data.push(body);
-  fs.writeFile(contactsPath, JSON.stringify(data));
-  return body;
-};
-
-const updateContact = async (contactId, body) => {
-  const data = await listContacts();
-  const index = data.findIndex(el => el.id === contactId);
-  if (index === -1) {
-    return null;
-  }
-  const result = { ...data[index], ...body };
-  data.splice(index, 1, result);
-  fs.writeFile(contactsPath, JSON.stringify(data));
-  return result;
-};
-
-module.exports = {
-  listContacts,
-  getContactById,
-  removeContact,
-  addContact,
-  updateContact,
-};
+module.exports = Contact;

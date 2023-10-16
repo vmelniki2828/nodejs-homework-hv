@@ -28,6 +28,8 @@ const contactSchemaJoi = Joi.object({
     favorite: Joi.boolean(),
 });
 
+
+
 const favoriteSchemaJoi = Joi.object({
     favorite: Joi.boolean().required().messages({
         "any.required": err.errMsgFavoriteRequired,

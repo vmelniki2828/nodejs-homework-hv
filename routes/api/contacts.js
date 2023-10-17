@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const ctrl = require("../../controllers/contacts");
-const validateBody = require("../../middlewares/validate");
-const isValidId = require("../../middlewares/validateId");
-const schemas = require("../../schema/contacts");
+const validateBody = require("../../middlewares/validateBody");
+const isValidId = require("../../middlewares/isValidId");
+const schemas = require("../../schemas/contacts");
 
 router.get("/", ctrl.listContacts);
 router.post("/", validateBody(schemas.contactSchemaJoi), ctrl.addContact);

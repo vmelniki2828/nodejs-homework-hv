@@ -1,4 +1,4 @@
-const saveErr = (err, data, next) => {
+const handleSaveError = (err, data, next) => {
     err.status = 400;
 
     if (err.code === 11000) {
@@ -9,4 +9,4 @@ const saveErr = (err, data, next) => {
     next();
 };
 
-module.exports = saveErr;
+module.exports = handleSaveError;

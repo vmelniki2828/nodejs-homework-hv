@@ -1,7 +1,7 @@
 const HttpError = require("../helpers/HttpError");
 const isEmptyObj = require("../helpers/isEmptyObj");
 
-const validate = (schema, isFavorite = false) => {
+const validateBody = (schema, isFavorite = false) => {
     const func = (req, res, next) => {
         if (!isEmptyObj(req.body)) {
             const { error } = schema.validate(req.body);
@@ -27,5 +27,4 @@ const validate = (schema, isFavorite = false) => {
     return func;
 };
 
-
-module.exports = validate;
+module.exports = validateBody;
